@@ -51,11 +51,12 @@ def generate_analysis(context: str) -> tuple[bool, str]:
             return False, "Error: Falta instalar google-generativeai. Ver requirements.txt."
         return False, "Error: GEMINI_API_KEY no configurada. Crea un archivo .env con tu API key."
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(
             context,
             generation_config={
-                "temperature": 0.4,
+                "temperature": 0.7,
+                "top_p": 0.95,
                 "max_output_tokens": 2048,
             },
         )

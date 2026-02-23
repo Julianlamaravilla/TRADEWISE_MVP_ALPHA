@@ -45,13 +45,15 @@ def build_context(ticker: str, risk_profile: str, horizon: str, indicators: dict
         "---",
         "",
         "Responde en español, de forma clara y estructurada. Incluye las siguientes secciones:",
-        "1. **Análisis técnico**: Interpretación de medias móviles, RSI y volatilidad.",
+        "1. **Análisis técnico**: Explica detalladamente la relación entre medias móviles, RSI y volatilidad. Justifica cada interpretación con base en los valores proporcionados.",
         "2. **Sentimiento de noticias**: Clasifica el sentimiento general como POSITIVO, NEGATIVO o NEUTRAL y justifica brevemente.",
-        "3. **Escenario alcista**: Posible evolución favorable y condiciones que la apoyarían.",
-        "4. **Escenario bajista**: Posibles riesgos y evolución desfavorable.",
+        "3. **Escenario alcista**: Describe condiciones específicas que deberían cumplirse para que este escenario ocurra. Sé técnico y específico.",
+        "4. **Escenario bajista**: Describe riesgos concretos y señales técnicas que confirmarían este escenario.",
         "5. **Evaluación de riesgo**: Nivel de riesgo (bajo/medio/alto) y por qué.",
         "6. **Recomendación según perfil**: Adapta el tono y las consideraciones al perfil de riesgo indicado.",
         "7. **Advertencia**: Incluye una advertencia explícita de que este análisis NO es asesoría financiera y que el usuario debe consultar a un profesional.",
+        "8. **Advertencia**: Para el sentimiento, primero analiza brevemente cada titular y luego sintetiza el sentimiento general justificando con ejemplos concretos.",
+        "9. **Advertencia**: Desarrolla cada sección con al menos 2–3 párrafos explicativos. No seas breve. Profundiza en la interpretación técnica y contextual."
     ])
     return "\n".join(lines)
 
