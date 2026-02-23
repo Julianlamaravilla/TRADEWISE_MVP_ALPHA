@@ -60,9 +60,23 @@ def generate_analysis(context: str) -> tuple[bool, str]:
                 "max_output_tokens": 2048,
             },
         )
-        if not response or not response.text:
-            return False, "Error: El modelo no devolvió texto. Intenta de nuevo."
-        return True, response.text.strip()
+        if not response:
+            return False, "Error: No se recibió contenido del modelo."
+        if not response.candidates:
+            return False, "Error: No se recibió contenido del modelo."
+        content = response.candidates[0].content
+        if not hasattr(content, "parts") or not content.parts:
+            return False, "Error: No se recibió contenido del modelo."
+        full_text = ""
+        for part in response.candidates[0].content.parts:
+            if hasattr(part, "text") and part.text:
+                full_text += part.text
+        if not full_text.strip():
+            return False, "Error: No se recibió contenido del modelo."
+        print("----- DEBUG GEMINI RESPONSE -----")
+        print("Longitud total:", len(full_text))
+        print("----- FIN DEBUG -----")
+        return True, full_text.strip()
     except Exception as e:
         err_msg = str(e).strip() or "Error desconocido"
         if "API_KEY" in err_msg.upper() or "invalid" in err_msg.lower():
