@@ -58,7 +58,7 @@ def generate_analysis(context: str) -> tuple[bool, str]:
                 "temperature": 0.7,
                 "top_p": 0.95,
                 "max_output_tokens": 2048,
-            },
+            }
         )
         if not response:
             return False, "Error: No se recibió contenido del modelo."
