@@ -5,16 +5,61 @@ Punto de entrada: streamlit run app.py
 """
 
 import streamlit as st
+import altair as alt
 from data_fetcher import get_historical_data, get_news_headlines, validate_ticker
 from indicators import compute_all_indicators
 from llm_client import generate_analysis
+from tickers import TOP_100_TICKERS
 
 
 # Configuración de la página
-st.set_page_config(page_title="TradeWise MVP", page_icon="📈", layout="wide")
+st.set_page_config(page_title="TradeWise AI", page_icon="📈", layout="wide")
 
-st.title("📈 TradeWise MVP")
-st.caption("Análisis de trading asistido por IA (no sustituye asesoría profesional)")
+# Estilos personalizados (tema fintech azul, botones, contenedores)
+st.markdown(
+    """
+    <style>
+    /* Ajuste general de la zona principal */
+    main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    /* Botón principal más grande, redondeado y con sombra */
+    .stButton > button {
+        background-color: #1E3A8A;
+        color: #E2E8F0;
+        border-radius: 999px;
+        padding: 0.6rem 1.6rem;
+        border: none;
+        font-weight: 600;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.55);
+    }
+    .stButton > button:hover {
+        background-color: #1D4ED8;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.75);
+    }
+
+    /* Tarjetas de métricas con fondo contrastado y bordes redondeados */
+    div[data-testid="stMetric"] {
+        background-color: #020617;
+        padding: 1rem 1.25rem;
+        border-radius: 0.9rem;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.75);
+    }
+
+    /* Contenedores de análisis con fondo ligeramente más claro */
+    .analysis-container {
+        background-color: #020617;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 6px 22px rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 def build_context(ticker: str, risk_profile: str, horizon: str, indicators: dict, headlines: list[str]) -> str:
@@ -59,24 +104,45 @@ def build_context(ticker: str, risk_profile: str, horizon: str, indicators: dict
 
 
 def main():
-    ticker = st.text_input("Ticker", value="AAPL", placeholder="Ej: AAPL, MSFT, GOOGL").strip().upper()
-    risk_profile = st.selectbox(
-        "Perfil de riesgo",
-        options=["Conservador", "Moderado", "Agresivo"],
-        index=1,
-    )
-    horizon = st.selectbox(
-        "Horizonte",
-        options=["Corto plazo", "Mediano plazo", "Largo plazo"],
-        index=1,
-    )
+    # Sidebar: panel de control
+    with st.sidebar:
+        st.markdown("### Panel de control")
+        selected_ticker = st.selectbox(
+            "Seleccione una acción:",
+            TOP_100_TICKERS,
+        )
+        ticker = selected_ticker
+        risk_profile = st.selectbox(
+            "Perfil de riesgo",
+            options=["Conservador", "Moderado", "Agresivo"],
+            index=1,
+        )
+        horizon = st.selectbox(
+            "Horizonte de inversión",
+            options=["Corto plazo", "Mediano plazo", "Largo plazo"],
+            index=1,
+        )
+        generate_clicked = st.button("Generar análisis", use_container_width=True)
 
-    if not ticker:
-        st.warning("Ingresa un ticker para continuar.")
-        return
+        st.markdown("---")
+        st.caption(
+            "Universo limitado a acciones del S&P 100 para garantizar "
+            "liquidez y calidad de datos."
+        )
 
-    if st.button("Generar análisis"):
+    # Header principal en el área central
+    st.markdown("## TradeWise AI")
+    st.markdown(
+        "_Análisis inteligente de acciones basado en IA — diseñado para una visión clara, "
+        "profesional y orientada a decisiones._"
+    )
+    st.divider()
+
+    if generate_clicked:
         with st.spinner("Validando ticker y obteniendo datos..."):
+            if ticker not in TOP_100_TICKERS:
+                st.error("Ticker no permitido. Solo se pueden analizar las 100 acciones principales.")
+                return
             if not validate_ticker(ticker):
                 st.error(f"Ticker '{ticker}' no válido o sin datos. Verifica el símbolo e intenta de nuevo.")
                 return
@@ -89,18 +155,76 @@ def main():
         indicators = compute_all_indicators(prices)
         context = build_context(ticker, risk_profile, horizon, indicators, headlines)
 
-        with st.spinner("Generando análisis con IA..."):
+        # Sección de métricas visuales
+        st.markdown("### Indicadores clave")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        last_close = indicators.get("last_close")
+        ma_20 = indicators.get("ma_20")
+        ma_50 = indicators.get("ma_50")
+        rsi = indicators.get("rsi")
+        vol = indicators.get("volatility")
+
+        col1.metric(
+            "Precio actual",
+            f"${last_close:,.2f}" if last_close is not None else "N/A",
+        )
+        col2.metric(
+            "SMA 20",
+            f"${ma_20:,.2f}" if ma_20 is not None else "N/A",
+        )
+        col3.metric(
+            "SMA 50",
+            f"${ma_50:,.2f}" if ma_50 is not None else "N/A",
+        )
+        col4.metric(
+            "RSI (14)",
+            f"{rsi:.2f}" if rsi is not None else "N/A",
+        )
+        col5.metric(
+            "Volatilidad anualizada",
+            f"{vol * 100:.2f} %" if vol is not None else "N/A",
+        )
+
+        # Gráfico profesional de precio histórico
+        st.markdown("### Evolución del precio (últimos 6 meses)")
+        price_df = prices[["Close"]].reset_index()
+        price_df.columns = ["Fecha", "Precio de cierre"]
+        price_chart = (
+            alt.Chart(price_df)
+            .mark_line(interpolate="monotone")
+            .encode(
+                x=alt.X("Fecha:T", title="Fecha"),
+                y=alt.Y("Precio de cierre:Q", title="Precio de cierre (USD)"),
+                tooltip=["Fecha:T", "Precio de cierre:Q"],
+            )
+            .properties(height=400)
+        )
+        st.altair_chart(price_chart, use_container_width=True)
+
+        # Análisis generado por IA en contenedor elegante
+        with st.spinner("Analizando datos y generando informe con IA..."):
             success, result = generate_analysis(context)
         if not success:
             st.error(result)
             return
 
-        # Mostrar resultados en secciones
-        st.divider()
-        st.subheader("Resultado del análisis")
-        st.markdown(result)
-        st.divider()
-        st.caption("TradeWise MVP — Este contenido no constituye asesoría financiera. Consulta a un profesional.")
+        st.markdown("### Análisis generado por IA")
+        with st.container():
+            st.markdown(
+                '<div class="analysis-container">',
+                unsafe_allow_html=True,
+            )
+            with st.expander("Ver análisis completo", expanded=True):
+                st.markdown(result)
+            st.markdown(
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+        st.caption(
+            "TradeWise AI — Este contenido no constituye asesoría financiera. "
+            "Consulta siempre a un profesional."
+        )
 
 
 if __name__ == "__main__":

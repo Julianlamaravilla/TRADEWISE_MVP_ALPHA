@@ -93,7 +93,7 @@ Se abrirá el navegador en `http://localhost:8501`. Si no se abre, visita esa UR
 
 ## Ejemplo de uso
 
-1. En **Ticker** escribe el símbolo del activo (ej: `AAPL`, `MSFT`, `GOOGL`).
+1. En el desplegable **Seleccione una acción** elige el ticker del activo (ej: `AAPL`, `MSFT`, `GOOGL`).
 2. Elige **Perfil de riesgo**: Conservador, Moderado o Agresivo.
 3. Elige **Horizonte**: Corto, Mediano o Largo plazo.
 4. Pulsa **Generar análisis**.
@@ -108,6 +108,7 @@ Se abrirá el navegador en `http://localhost:8501`. Si no se abre, visita esa UR
 tradewise_mvp/
 ├── app.py           # Interfaz Streamlit y orquestación
 ├── llm_client.py    # Cliente del LLM (Gemini); fácil de cambiar de proveedor
+├── tickers.py       # Lista estática de los 100 tickers permitidos
 ├── data_fetcher.py  # Obtención de datos (yfinance)
 ├── indicators.py    # Cálculo de indicadores técnicos
 ├── requirements.txt
@@ -130,6 +131,20 @@ tradewise_mvp/
 - **"GEMINI_API_KEY no configurada"**: Crea `.env` a partir de `.env.example` y añade tu clave.
 - **"Ticker no válido"**: Comprueba que el símbolo sea correcto (ej: AAPL para Apple) y que haya datos en Yahoo Finance.
 - **Error de API / quota**: Verifica la clave en AI Studio y los límites de uso de la API.
+
+---
+
+## Limitación a las 100 acciones principales
+
+El sistema está **intencionalmente limitado** a analizar únicamente las **100 acciones más importantes (large cap) del mercado estadounidense**, definidas en la lista `TOP_100_TICKERS` del archivo `tickers.py`.
+
+Esta restricción existe por:
+
+- **Control de calidad**: Centrarse en activos con alta liquidez y mejor cobertura de datos.
+- **Enfoque estratégico**: Mantener el MVP acotado a un universo de activos relevante y representativo.
+- **Reducción de riesgo de datos erróneos**: Menos probabilidad de símbolos exóticos, sin liquidez o con datos incompletos.
+
+Si necesitas ampliar el universo de activos permitido, deberás **modificar manualmente** la lista `TOP_100_TICKERS` en `tickers.py` (añadiendo o sustituyendo tickers) y volver a ejecutar la aplicación.
 
 ---
 
