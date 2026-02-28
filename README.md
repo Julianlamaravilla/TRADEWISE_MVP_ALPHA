@@ -151,3 +151,28 @@ Si necesitas ampliar el universo de activos permitido, deberás **modificar manu
 ## Licencia y disclaimer
 
 Proyecto de ejemplo. El análisis generado **no constituye asesoría financiera**. El usuario es responsable de sus decisiones de inversión.
+
+---
+
+## Project Preview
+
+<p align="center">
+  <img src="images/capture_1.png" alt="TradeWise AI preview 1" width="800" />
+</p>
+
+<p align="center">
+  <img src="images/capture_2.png" alt="TradeWise AI preview 2" width="800" />
+</p>
+
+### Video Demo
+
+[Video demo coming soon — replace with YouTube link]
+
+<p align="center">
+  <!-- Replace VIDEO_ID_HERE with the actual YouTube video ID -->
+  <a href="https://youtu.be/uzMhC7S7dcA" target="_blank">
+    <img src="./images/capture_1.png" alt="TradeWise AI - Video Demo" width="800" />
+  </a>
+</p>
+
+Este enlace debe apuntar a un video corto demostrando cómo funciona el proyecto de principio a fin.
