@@ -166,7 +166,7 @@ Proyecto de ejemplo. El análisis generado **no constituye asesoría financiera*
 
 ### Video Demo
 
-[Video demo coming soon — replace with YouTube link]
+https://youtu.be/uzMhC7S7dcA
 
 <p align="center">
   <!-- Replace VIDEO_ID_HERE with the actual YouTube video ID -->
